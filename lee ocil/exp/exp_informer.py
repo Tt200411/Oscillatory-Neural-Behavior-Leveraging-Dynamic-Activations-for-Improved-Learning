@@ -26,41 +26,32 @@ class Exp_Informer(Exp_Basic):
         super(Exp_Informer, self).__init__(config)  # 再调用父类初始化
     
     def _build_model(self):
-        model_dict = {
-            'informer':Informer,
-            'informerstack':InformerStack,
-        }
+        model = Informer(
+            self.config.enc_in,
+            self.config.dec_in, 
+            self.config.c_out, 
+            self.config.seq_len, 
+            self.config.label_len,
+            self.config.pred_len,
+            self.config.factor,
+            self.config.d_model, 
+            self.config.n_heads, 
+            self.config.e_layers,
+            self.config.d_layers, 
+            self.config.d_ff,
+            self.config.dropout, 
+            self.config.attn,
+            self.config.embed,
+            self.config.freq,
+            self.config.activation,
+            self.config.output_attention,
+            self.config.distil,
+            self.config.mix,
+            device=self.device,
+            encoder_lee_types=self.config.encoder_lee_types,
+            decoder_lee_types=self.config.decoder_lee_types
+        ).to(self.device)
         
-        if self.config.model=='informer' or self.config.model=='informerstack':
-            e_layers = self.config.e_layers if self.config.model=='informer' else self.config.s_layers
-            model = model_dict[self.config.model](
-                self.config.enc_in,
-                self.config.dec_in, 
-                self.config.c_out, 
-                self.config.seq_len, 
-                self.config.label_len,
-                self.config.pred_len, 
-                self.config.factor,
-                self.config.d_model, 
-                self.config.n_heads, 
-                e_layers,
-                self.config.d_layers, 
-                self.config.d_ff,
-                self.config.dropout, 
-                self.config.attn,
-                self.config.embed,
-                self.config.freq,
-                self.config.activation,
-                self.config.output_attention,
-                self.config.distil,
-                self.config.mix,
-                self.device,
-                self.config.encoder_lee_types,
-                self.config.decoder_lee_types
-            ).float()
-        
-        if self.config.use_multi_gpu and self.config.use_gpu:
-            model = nn.DataParallel(model, device_ids=self.config.device_ids)
         return model
 
     def _get_data(self, flag):
@@ -152,6 +143,7 @@ class Exp_Informer(Exp_Basic):
             iter_count = 0
             train_loss = []
             
+            self.model = self.model.to(self.device)
             self.model.train()
             epoch_time = time.time()
             
@@ -224,7 +216,7 @@ class Exp_Informer(Exp_Basic):
             adjust_learning_rate(model_optim, epoch+1, self.config)
             
         best_model_path = path+'/'+'checkpoint.pth'
-        self.model.load_state_dict(torch.load(best_model_path))
+        torch.save(self.model.state_dict(), best_model_path)
         
         return self.model
 

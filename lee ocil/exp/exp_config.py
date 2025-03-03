@@ -46,10 +46,11 @@ class InformerConfig:
         self.use_gpu = True
         self.use_multi_gpu = False
         self.device = 'cuda:0'
-        self.device_ids = '0'  # GPU设备ID
+        self.gpu = 0
+        self.devices = '0'  # GPU设备ID
         
         # 数据集参数
-        self.root_path = '/Users/tangbao/project/chaostic NN/lee ocil-改进型号/ETT-small'
+        self.root_path = './ETT-small'  # 使用相对路径
         self.data_path = 'ETTh1.csv'
         self.features = 'M'  # 预测任务类型
         self.target = 'OT'  # 目标特征
@@ -66,5 +67,3 @@ class InformerConfig:
         self.use_lee = True  # 是否使用Lee振荡器
         self.lee_grid_search = True  # 是否进行网格搜索
         self.lee_types_to_try = [1, 2, 3, 4]  # 网格搜索时尝试的Lee类型
-        
-        # 其他参数保持不变 ... 
