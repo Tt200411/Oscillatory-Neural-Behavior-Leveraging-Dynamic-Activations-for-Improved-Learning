@@ -89,6 +89,16 @@ class Informer(nn.Module):
             }
             self.activation = lee_funcs[encoder_lee_types[0] if encoder_lee_types else 1]
         
+        # 确保所有子模块都在正确的设备上
+        self.enc_embedding = self.enc_embedding.to(device)
+        self.dec_embedding = self.dec_embedding.to(device)
+        self.encoder = self.encoder.to(device)
+        self.decoder = self.decoder.to(device)
+        self.projection = self.projection.to(device)
+        
+        # 如果使用Lee振荡器，也要确保它在正确的设备上
+        self.lee = self.lee.to(device)
+        
     def forward(self, x_enc, x_mark_enc, x_dec, x_mark_dec, 
                 enc_self_mask=None, dec_self_mask=None, dec_enc_mask=None):
         enc_out = self.enc_embedding(x_enc, x_mark_enc)
