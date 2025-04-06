@@ -25,6 +25,7 @@ class InformerConfig:
         self.train_epochs = 6
         self.patience = 3  # 早停耐心值
         self.num_workers = 0  # 数据加载线程数
+        self.lradj = 'type1'  # 学习率调整类型
         
         # 其他参数
         self.output_attention = False  # 是否输出注意力
@@ -45,11 +46,12 @@ class InformerConfig:
         # 设备参数
         self.use_gpu = True
         self.use_multi_gpu = False
-        self.device = 'cuda:0'
-        self.device_ids = '0'  # GPU设备ID
-        
+        self.device = 'cuda:0' # GPU设备ID
+        self.gpu = 0
+        self.devices = '0'  # GPU设备ID
+
         # 数据集参数
-        self.root_path = '/Users/tangbao/project/chaostic NN/chaotic-NN-bitcoin-prediction/ETT-small'
+        self.root_path = './ETT-small'
         self.data_path = 'ETTh1.csv'
         self.features = 'M'  # 预测任务类型
         self.target = 'OT'  # 目标特征

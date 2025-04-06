@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
+from lee_oc import LeeOscillator
 
 class ConvLayer(nn.Module):
     def __init__(self, c_in):
@@ -25,7 +26,7 @@ class ConvLayer(nn.Module):
         return x
 
 class EncoderLayer(nn.Module):
-    def __init__(self, attention, d_model, d_ff=None, dropout=0.1, activation="relu"):
+    def __init__(self, attention, d_model, d_ff=None, dropout=0.1, activation="relu", lee_oscillator_type=1):
         super(EncoderLayer, self).__init__()
         d_ff = d_ff or 4*d_model
         self.attention = attention
@@ -34,17 +35,14 @@ class EncoderLayer(nn.Module):
         self.norm1 = nn.LayerNorm(d_model)
         self.norm2 = nn.LayerNorm(d_model)
         self.dropout = nn.Dropout(dropout)
-        if activation == "lee":
-            def lee_activation(x):
-                shape = x.shape
-                x = x.view(-1).cpu().numpy()
-                result = np.zeros_like(x)
-                for i, val in enumerate(x):
-                    result[i] = F.relu(val)[0] if activation == "relu" else F.gelu(val)[0]
-                return torch.from_numpy(result).view(shape).to(x.device)
-            self.activation = lee_activation
+        if(activation == "relu"):
+            self.activation = F.relu
+        elif(activation == "lee"):
+            self.lee_oscillator = LeeOscillator()
+            self.lee_oscillator_type = lee_oscillator_type
+            self.activation = lambda x: self.lee_oscillator(x, self.lee_oscillator_type)
         else:
-            self.activation = F.relu if activation == "relu" else F.gelu
+            self.activation = F.gelu
 
     def forward(self, x, attn_mask=None):
         # x [B, L, D]
