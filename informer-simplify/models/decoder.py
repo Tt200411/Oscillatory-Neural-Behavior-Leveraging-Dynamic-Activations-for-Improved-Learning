@@ -1,10 +1,11 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from lee_oc import LeeOscillator
 
 class DecoderLayer(nn.Module):
     def __init__(self, self_attention, cross_attention, d_model, d_ff=None,
-                 dropout=0.1, activation="relu"):
+                 dropout=0.1, activation="relu", lee_oscillator_type=1):
         super(DecoderLayer, self).__init__()
         d_ff = d_ff or 4*d_model
         self.self_attention = self_attention
@@ -15,8 +16,14 @@ class DecoderLayer(nn.Module):
         self.norm2 = nn.LayerNorm(d_model)
         self.norm3 = nn.LayerNorm(d_model)
         self.dropout = nn.Dropout(dropout)
-        self.activation = F.relu if activation == "relu" else F.gelu
-
+        if(activation == "relu"):
+            self.activation = F.relu
+        elif(activation == "lee"):
+            self.lee_oscillator = LeeOscillator()
+            self.lee_oscillator_type = lee_oscillator_type
+            self.activation = lambda x: self.lee_oscillator(x, self.lee_oscillator_type)
+        else:
+            self.activation = F.gelu
     def forward(self, x, cross, x_mask=None, cross_mask=None):
         x = x + self.dropout(self.self_attention(
             x, x, x,
