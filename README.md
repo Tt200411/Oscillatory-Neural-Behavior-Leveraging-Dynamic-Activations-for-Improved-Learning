@@ -116,9 +116,9 @@ If you find this project useful in your research, please cite:
 
 ```
 @article{leeocil2025,
-  title={Lee-Ocil: Oscillatory Activation for Robust Time Series Forecasting under Extreme Conditions},
-  author={Your Name},
-  journal={arXiv preprint},
+  title={COTN},
+  author={Tang},
+  journal={AAAI},
   year={2025}
 }
 
